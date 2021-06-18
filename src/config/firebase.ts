@@ -1,5 +1,5 @@
-import * as admin from 'firebase-admin'
-import * as functions from 'firebase-functions'
+import * as admin from 'firebase-admin';
+import * as functions from 'firebase-functions';
 
 admin.initializeApp({
   credential: admin.credential.cert({
@@ -8,7 +8,6 @@ admin.initializeApp({
     clientEmail: functions.config().client.email
   }),
   databaseURL: 'https://toptal-d15b0.firebaseio.com'
-})
+});
 
-const db = admin.firestore()
-export { admin, db }
+export { admin }
