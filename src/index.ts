@@ -1,18 +1,13 @@
 import * as functions from 'firebase-functions';
 import * as express from 'express';
-import { authEndpoint } from './middleware/authentication';
+import RestaurantController from './controllers/restaurants';
 
 const app = express();
+const router = express.Router();
 
-app.get('/', authEndpoint, async (req, res) => {
-  try {
-    res.status(200).send(`Hey there ${JSON.stringify(req.user)}?!`);
-  } catch (error) {
-    res.status(500).send(error);
-    return;
-  }
-  
-});
+router.use('/restaurants', RestaurantController);
+
+app.use('/', router);
 
 exports.app = functions.https.onRequest(app);
 
