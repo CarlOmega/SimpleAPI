@@ -47,7 +47,7 @@ RestaurantController.get("/", authEndpoint, async (req: Request, res: Response) 
     query = query.where("owner", "==", user.uid);
   
   try {
-    const querySnapshot = await db.get();
+    const querySnapshot = await query.get();
     const data = querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
     return res.status(200).send(data);
   } catch (error) {
@@ -58,12 +58,12 @@ RestaurantController.get("/", authEndpoint, async (req: Request, res: Response) 
 RestaurantController.put("/", authEndpoint, async (req: Request, res: Response) => {
   // Create edit owned resturants if owner
   // Admin can edit any
-  res.status(500);
+  res.status(501);
 });
 
 RestaurantController.delete("/", authEndpoint, async (req: Request, res: Response) => {
   // Admin can delete any
-  res.status(500);
+  res.status(501);
 });
 
 export default RestaurantController;
