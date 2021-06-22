@@ -1,5 +1,5 @@
 interface User {
-  accountType: string,
+  accountType: "user" | "owner",
   userName: string,
   email: string
 }
