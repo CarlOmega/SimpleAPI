@@ -23,15 +23,14 @@ UserController.post("/", authEndpoint, async (req: Request, res: Response) => {
   }
 });
 
-UserController.put("/", authEndpoint, async (req: Request, res: Response) => {
+UserController.put("/:userId", authEndpoint, async (req: Request, res: Response) => {
   // Admin seems to be only one who can update accounts
   if (!req.user.admin)
     return res.status(403).send({message: "Cannot perform action"});
   
-  const uid = req.query.uid as string;
   const user = req.body.user;
-
-  if (!uid) return res.status(400).send({message: "No uid in query"});
+  const uid = req.params.userId;
+  if (!uid) return res.status(400).send({message: "No uid specified"});
   if (!user) return res.status(400).send({message: "No user in body"});
 
   try {
@@ -47,14 +46,14 @@ UserController.put("/", authEndpoint, async (req: Request, res: Response) => {
   
 });
 
-UserController.delete("/", authEndpoint, async (req: Request, res: Response) => {
+UserController.delete("/:userId", authEndpoint, async (req: Request, res: Response) => {
   // Admin can delete any accounts
   if (!req.user.admin)
     return res.status(403).send({message: "Cannot perform action"});
-  
-  const uid = req.query.uid as string;
+  if (!req.params.userId)
+    return res.status(400).send();
   try {
-    await admin.auth().deleteUser(uid);
+    await admin.auth().deleteUser(req.params.userId);
     return res.status(200).send({message: "Successful delete"});
   } catch (error) {
     return res.status(500).send({message: error.message});

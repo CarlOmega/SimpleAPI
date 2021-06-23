@@ -26,9 +26,11 @@ RestaurantController.post("/", authEndpoint, async (req: Request, res: Response)
     return res.status(403).send({message: "Cannot perform action"});
   
   try {
-    const restaurant: NewRestaurant = await newRestaurantSchema.validateAsync(req.body.restaurant);
+    const restaurant: Restaurant = await newRestaurantSchema.validateAsync(req.body.restaurant);
     restaurant.owner = user.uid;
-    restaurant.rating = 0;
+    restaurant.ratings = 0;
+    restaurant.avg = 0;
+    restaurant.total = 0;
 
     const document = await db.add(restaurant);
     return res.status(201).send(document.id);
@@ -43,7 +45,7 @@ RestaurantController.get("/", authEndpoint, async (req: Request, res: Response) 
   // Return only owned resturants if owner claim
   const user = req.user;
   const offset = req.query.offset;
-  let query = db.orderBy("rating", "desc").limit(5);
+  let query = db.orderBy("avg", "desc").limit(5);
   if (user.owner)
     query = query.where("owner", "==", user.uid);
   if (offset && Number.isInteger(+offset))
@@ -57,15 +59,15 @@ RestaurantController.get("/", authEndpoint, async (req: Request, res: Response) 
   }
 });
 
-RestaurantController.put("/", authEndpoint, async (req: Request, res: Response) => {
+RestaurantController.put("/:restaurantId", authEndpoint, async (req: Request, res: Response) => {
   // Create edit owned resturants if owner
   // Admin can edit any
-  res.status(501);
+  return res.status(501);
 });
 
-RestaurantController.delete("/", authEndpoint, async (req: Request, res: Response) => {
+RestaurantController.delete("/:restaurantId", authEndpoint, async (req: Request, res: Response) => {
   // Admin can delete any
-  res.status(501);
+  return res.status(501);
 });
 
 export default RestaurantController;
