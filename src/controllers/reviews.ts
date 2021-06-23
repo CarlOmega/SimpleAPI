@@ -35,11 +35,15 @@ ReviewController.post("/:restaurantId", authEndpoint, async (req: Request, res: 
   const restaurantRef = db.doc(restaurantId);
   try {
     const review: Review = await newReviewSchema.validateAsync(req.body.review);
-    review.author = user.uid;
-
-    const document = await restaurantRef.collection("reviews").add(review);
     const restaurant =  (await restaurantRef.get()).data();
     if (!restaurant) throw Error("Issue with restaruant");
+
+    review.author = user.uid;
+    review.owner = restaurant.owner;
+    review.reply = "";
+
+    const document = await restaurantRef.collection("reviews").add(review);
+    
     restaurant.total += review.rating;
     restaurant.ratings++;
     restaurant.avg = restaurant.total / restaurant.ratings;
