@@ -17,8 +17,9 @@ const newReviewSchema = Joi.object({
     .string()
     .required(),
   dateOfVisit: Joi
-    .date()
-    .timestamp('unix')
+    .number()
+    .integer()
+    .min(1)
     .required(),
 });
 
