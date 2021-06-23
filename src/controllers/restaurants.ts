@@ -28,7 +28,7 @@ RestaurantController.post("/", authEndpoint, async (req: Request, res: Response)
   try {
     const restaurant: NewRestaurant = await newRestaurantSchema.validateAsync(req.body.restaurant);
     restaurant.owner = user.uid;
-    restaurant.rating = 5.0;
+    restaurant.rating = 0;
 
     const document = await db.add(restaurant);
     return res.status(201).send(document.id);
@@ -42,10 +42,12 @@ RestaurantController.get("/", authEndpoint, async (req: Request, res: Response) 
   // Get all resturants if normal user or admin
   // Return only owned resturants if owner claim
   const user = req.user;
-  let query = db.limit(10);
+  const offset = req.query.offset;
+  let query = db.orderBy("rating", "desc").limit(5);
   if (user.owner)
     query = query.where("owner", "==", user.uid);
-  
+  if (offset && Number.isInteger(+offset))
+    query = query.offset(+offset);
   try {
     const querySnapshot = await query.get();
     const data = querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
