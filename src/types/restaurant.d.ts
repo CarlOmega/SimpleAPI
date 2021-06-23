@@ -13,5 +13,6 @@ interface Review {
   author?: string,
   rating: number,
   comment: string,
+  dateOfVist: number,
   reply?: string
 }

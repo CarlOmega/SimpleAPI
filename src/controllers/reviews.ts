@@ -16,6 +16,10 @@ const newReviewSchema = Joi.object({
   comment: Joi
     .string()
     .required(),
+  dateOfVisit: Joi
+    .date()
+    .timestamp('unix')
+    .required(),
 });
 
 // Using CRUD
@@ -47,7 +51,21 @@ ReviewController.post("/:restaurantId", authEndpoint, async (req: Request, res: 
 });
 
 ReviewController.get("/:restaurantId", authEndpoint, async (req: Request, res: Response) => {
-  return res.status(501);
+  const restaurantId = req.params.restaurantId;
+  if (!restaurantId) return res.status(400).send({message: "Need a restaurant ID"});
+
+  const offset = req.query.offset;
+  let query = db.doc(restaurantId).collection("reviews").orderBy("dateOfVisit", "desc").limit(5);
+  if (offset && Number.isInteger(+offset))
+    query = query.offset(+offset);
+  
+  try {
+    const querySnapshot = await query.get();
+    const data = querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
+    return res.status(200).send(data);
+  } catch (error) {
+    return res.status(500).send({message: error.message});
+  }
 });
 
 ReviewController.put("/:restaurantId", authEndpoint, async (req: Request, res: Response) => {
