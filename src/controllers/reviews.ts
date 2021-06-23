@@ -69,8 +69,32 @@ ReviewController.get("/:restaurantId", authEndpoint, async (req: Request, res: R
   }
 });
 
-ReviewController.put("/:restaurantId", authEndpoint, async (req: Request, res: Response) => {
-  return res.status(501);
+ReviewController.put("/:restaurantId/:reviewId", authEndpoint, async (req: Request, res: Response) => {
+  const restaurantId = req.params.restaurantId;
+  const reviewId = req.params.reviewId;
+  const user = req.user;
+  const reply = req.body.reply;
+  if (!user.owner)
+    return res.status(403).send({message: "Cannot perform action"});
+  if (!restaurantId) return res.status(400).send({message: "Need a restaurant ID"});
+  if (!reviewId) return res.status(400).send({message: "Need a review ID"});
+  if (!reply) return res.status(400).send({message: "Need a reply"});
+
+  const restaurantRef = db.doc(restaurantId);
+  
+  
+  try {
+    const restaurant =  (await restaurantRef.get()).data();
+    if (!restaurant || restaurant.owner !== user.uid) throw Error("Issue with restaruant");
+
+    const reviewRef = restaurantRef.collection("reviews").doc(reviewId);
+    reviewRef.update({reply: reply});
+
+    return res.status(201).send(reply);
+  } catch (error) {
+    return res.status(500).send({message: error.message});
+  }
+
 });
 
 ReviewController.delete("/:restaurantId/:reviewId", authEndpoint, async (req: Request, res: Response) => {
