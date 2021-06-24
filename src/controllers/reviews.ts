@@ -92,6 +92,30 @@ ReviewController.get("/:restaurantId", authEndpoint, async (req: Request, res: R
   }
 });
 
+ReviewController.get("/:restaurantId/preview", authEndpoint, async (req: Request, res: Response) => {
+  const restaurantId = req.params.restaurantId;
+  if (!restaurantId) return res.status(400).send({message: "Need a restaurant ID"});
+
+  const topQuery = db.doc(restaurantId).collection("reviews").orderBy("rating", "desc").limit(1);
+  const bottomQuery = db.doc(restaurantId).collection("reviews").orderBy("rating", "asc").limit(1);
+  
+  try {
+    const topResults = await topQuery.get();
+    const bottomResults = await bottomQuery.get();
+    if (topResults.empty || bottomResults.empty) throw new Error("No reviews");
+    const top = topResults.docs[0];
+    const bottom = bottomResults.docs[0];
+
+    const data = {
+      top: top.data(),
+      bottom: bottom.data()
+    };
+    return res.status(200).send(data);
+  } catch (error) {
+    return res.status(500).send({message: error.message});
+  }
+});
+
 ReviewController.put("/:restaurantId/:reviewId", authEndpoint, async (req: Request, res: Response) => {
   const restaurantId = req.params.restaurantId;
   const reviewId = req.params.reviewId;
