@@ -67,7 +67,7 @@ ReviewController.get("/pending", authEndpoint, async (req: Request, res: Respons
   
   try {
     const querySnapshot = await query.get();
-    const data = querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
+    const data = querySnapshot.docs.map((doc) => ({id: doc.id, restaurantId: doc.ref.parent.parent?.id, ...doc.data()}));
     return res.status(200).send(data);
   } catch (error) {
     return res.status(500).send({message: error.message});
@@ -85,7 +85,7 @@ ReviewController.get("/:restaurantId", authEndpoint, async (req: Request, res: R
   
   try {
     const querySnapshot = await query.get();
-    const data = querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
+    const data = querySnapshot.docs.map((doc) => ({id: doc.id, restaurantId: doc.ref.parent.parent?.id, ...doc.data()}));
     return res.status(200).send(data);
   } catch (error) {
     return res.status(500).send({message: error.message});
