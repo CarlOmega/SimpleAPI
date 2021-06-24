@@ -45,11 +45,14 @@ RestaurantController.get("/", authEndpoint, async (req: Request, res: Response) 
   // Return only owned resturants if owner claim
   const user = req.user;
   const offset = req.query.offset;
+  const rating = req.query.rating;
   let query = db.orderBy("avg", "desc").limit(5);
   if (user.owner)
     query = query.where("owner", "==", user.uid);
   if (offset && Number.isInteger(+offset))
     query = query.offset(+offset);
+  if (rating && Number.isInteger(+rating))
+    query = query.where("avg", ">=", +rating);
   try {
     const querySnapshot = await query.get();
     const data = querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
