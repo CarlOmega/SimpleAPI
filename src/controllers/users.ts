@@ -23,6 +23,21 @@ UserController.post("/", authEndpoint, async (req: Request, res: Response) => {
   }
 });
 
+UserController.get("/", authEndpoint, async (req: Request, res: Response) => {
+  // Upon account creation only
+  const userClaims = req.user;
+
+  if (!userClaims.admin)
+    return res.status(403).send({message: "Not admin"});
+  
+  try {
+    const listUsers = await admin.auth().listUsers();
+    return res.status(201).send(listUsers.users);
+  } catch (error) {
+    return res.status(500).send({message: error.message});
+  }
+});
+
 UserController.put("/:userId", authEndpoint, async (req: Request, res: Response) => {
   // Admin seems to be only one who can update accounts
   if (!req.user.admin)
