@@ -47,6 +47,8 @@ RestaurantController.get("/", authEndpoint, async (req: Request, res: Response) 
   const offset = req.query.offset;
   const rating = req.query.rating;
   let query = db.orderBy("avg", "desc").limit(5);
+  if (!(user.user || user.admin || user.owner))
+    return res.status(403).send({message: "Cannot perform action"});
   if (user.owner)
     query = query.where("owner", "==", user.uid);
   if (offset && Number.isInteger(+offset))
