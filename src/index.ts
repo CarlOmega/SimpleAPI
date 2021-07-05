@@ -1,6 +1,10 @@
 import * as functions from 'firebase-functions';
+import * as express from 'express';
+import router from './router';
 
-export const helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info("Hello logs!", {structuredData: true});
-  response.send("Hello from Firebase!");
-});
+const app = express();
+
+app.use('/', router);
+
+exports.app = functions.https.onRequest(app);
+

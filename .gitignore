@@ -75,3 +75,6 @@ typings/
 # Mac Stuff
 .DS_Store
 
+# runtimeconfig for dev
+.runtimeconfig.json
+
